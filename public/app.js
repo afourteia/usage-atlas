@@ -85,14 +85,6 @@ document.querySelectorAll("dialog").forEach((dialog) =>
       dialog.close();
   }),
 );
-$("#today").textContent = new Date()
-  .toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  })
-  .toUpperCase();
 $("#timezone").textContent =
   `Reset times in ${Intl.DateTimeFormat().resolvedOptions().timeZone}.`;
 $("#about-button").addEventListener("click", () => showDialog("#about-dialog"));
@@ -293,7 +285,7 @@ async function loadHistory() {
     );
     $("#history-chart").innerHTML =
       data.length < 2
-        ? '<p class="history-empty">Your history starts here.<br>Keep Atlas running. Your quota trend will appear as more hourly samples arrive.</p>'
+        ? '<p class="history-empty">Not enough samples yet. History appears after at least two hourly readings.</p>'
         : timeline
             .map((d) =>
               d
@@ -371,7 +363,7 @@ function tick() {
       ? "Refreshing"
       : snapshot.accounts.some((a) => a.status !== "ok")
         ? "Needs attention"
-        : "Watching quietly";
+        : "Polling active";
   $("#next-poll").textContent = !online
     ? "Reconnecting automatically"
     : snapshot.polling

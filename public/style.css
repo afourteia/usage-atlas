@@ -1351,3 +1351,70 @@ dialog > p {
     font-size: 11px;
   }
 }
+
+/* Utility layout: usage summary followed by provider filters and actions. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+main {
+  padding-top: 20px;
+}
+.overview {
+  margin-bottom: 16px;
+}
+.section-heading {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.dashboard-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  padding-bottom: 8px;
+}
+.dashboard-actions .refresh {
+  min-height: 40px;
+}
+.panel-heading h2 {
+  margin-top: 0;
+}
+footer {
+  margin-top: 20px;
+  padding-top: 12px;
+}
+@media (max-width: 720px) {
+  main {
+    padding-top: 12px;
+  }
+  .overview {
+    margin-bottom: 8px;
+  }
+  .tabs {
+    gap: 14px;
+  }
+  .dashboard-actions {
+    padding-bottom: 0;
+    gap: 4px;
+  }
+  .dashboard-actions .refresh {
+    width: 36px;
+    height: 40px;
+    padding: 6px;
+  }
+  .dashboard-actions .refresh > span:first-child {
+    font-size: 21px;
+  }
+  #footer-status {
+    order: initial;
+    width: auto;
+  }
+}
