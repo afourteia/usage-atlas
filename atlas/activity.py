@@ -257,26 +257,37 @@ class TokenIndex:
                     else:
                         events[identity] = (account, at, tokens)
         hours = defaultdict(lambda: defaultdict(lambda: [0, 0]))
+        buckets = defaultdict(lambda: defaultdict(lambda: [0, 0]))
         for account, at, tokens in events.values():
             hour = int(at // 3600) * 3600
             hours[account][hour][0] += tokens
             hours[account][hour][1] += 1
+            quarter = int(at // 900) * 900
+            buckets[account][quarter][0] += tokens
+            buckets[account][quarter][1] += 1
             accounts[account]['recordCount'] += 1
         errors = json.loads(meta.get('errors', '{}'))
         for account in accounts.values():
             ident = account['id']
+            account['buckets'] = [{'at': at, 'tokens': values[0], 'records': values[1]} for at, values in sorted(buckets[ident].items())]
             account['hours'] = [{'at': at, 'tokens': values[0], 'records': values[1]} for at, values in sorted(hours[ident].items())]
             if errors.get(ident):
                 account['status'] = 'partial'
             elif account['status'] != 'partial':
                 account['status'] = 'ok' if supported[ident] else 'empty'
         global_hours = defaultdict(lambda: [0, 0])
+        global_buckets = defaultdict(lambda: [0, 0])
         for account in accounts.values():
+            for row in account['buckets']:
+                global_buckets[row['at']][0] += row['tokens']
+                global_buckets[row['at']][1] += row['records']
             for row in account['hours']:
                 global_hours[row['at']][0] += row['tokens']
                 global_hours[row['at']][1] += row['records']
         return {'accounts': list(accounts.values()),
                 'hours': [{'at': at, 'tokens': values[0], 'records': values[1]} for at, values in sorted(global_hours.items())],
+                'buckets': [{'at': at, 'tokens': values[0], 'records': values[1]} for at, values in sorted(global_buckets.items())],
+                'bucketSeconds': 900,
                 'indexedAt': float(meta.get('indexedAt', '0')) or None,
                 'retentionDays': 90, 'source': 'Local CLI session logs', 'timezone': 'UTC',
                 'note': 'Includes cached input tokens. Covers this machine only. Account attribution follows profile log directories; earlier sign-ins in a profile may be included.'}

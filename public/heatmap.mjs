@@ -25,7 +25,9 @@ let data = null,
 let version = "";
 
 function heatmapMarkup(account, id) {
-  const hours = account ? account.hours : data.hours;
+  const source = account || data;
+  const hours = source.buckets || source.hours;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const chart = buildHeatmap(hours, days);
   const label = account
     ? `${providers[account.provider]} · ${account.label}`
@@ -59,18 +61,18 @@ function heatmapMarkup(account, id) {
       : " Some accounts have no local token records.";
   const scale = `<div class="heatmap-scale"><span>0 recorded</span>${[0, 1, 2, 3, 4, 5].map((level) => `<i class="heatmap-swatch heat-${level}"></i>`).join("")}<span>${compact(chart.peak)} / hour</span></div>`;
   const header = `<div class="heatmap-summary"><span><strong>${compact(chart.sum)}</strong> recorded tokens</span><span><strong>${chart.activeHours}</strong> active hours</span><span><strong>${compact(chart.records)}</strong> response records</span></div>`;
-  const grid = `<div class="heatmap-grid" role="grid" aria-label="${escape(label)} token usage by day and hour, UTC" aria-rowcount="${days + 1}" aria-colcount="25"><div class="heatmap-axis" role="row"><span role="columnheader" class="heatmap-date">UTC</span>${Array.from({ length: 24 }, (_, hour) => `<span role="columnheader" class="heatmap-hour ${hour % 3 === 0 ? "major" : ""}">${String(hour).padStart(2, "0")}</span>`).join("")}</div>${chart.rows
+  const grid = `<div class="heatmap-grid" role="grid" aria-label="${escape(label)} token usage by day and hour, ${escape(timezone)}" aria-rowcount="${days + 1}" aria-colcount="25"><div class="heatmap-axis" role="row"><span role="columnheader" class="heatmap-date">Hour</span>${Array.from({ length: 24 }, (_, hour) => `<span role="columnheader" class="heatmap-hour ${hour % 3 === 0 ? "major" : ""}">${String(hour).padStart(2, "0")}</span>`).join("")}</div>${chart.rows
     .map(
       (row, index) =>
         `<div class="heatmap-row" role="row"><span class="heatmap-date" role="rowheader">${row.date.slice(5)}</span>${row.cells
           .map((cell, hour) => {
-            const text = `${cell.date} ${String(cell.hour).padStart(2, "0")}:00–${String((cell.hour + 1) % 24).padStart(2, "0")}:00 UTC · ${cell.future ? "Future hour" : `${format(cell.tokens)} tokens recorded · ${format(cell.records)} responses${cell.current ? " · Hour in progress" : ""}`}`;
+            const text = `${cell.date} ${String(cell.hour).padStart(2, "0")}:00–${String((cell.hour + 1) % 24).padStart(2, "0")}:00 ${timezone} · ${cell.future ? "Future hour" : `${format(cell.tokens)} tokens recorded · ${format(cell.records)} responses${cell.current ? " · Hour in progress" : ""}`}`;
             return `<button type="button" role="gridcell" class="heatmap-cell heat-${intensity(cell.tokens, chart.peak)} ${cell.future ? "future" : ""} ${cell.current ? "current" : ""}" tabindex="${index * 24 + hour === firstFocus ? "0" : "-1"}" data-index="${index * 24 + hour}" data-detail="${escape(text)}" aria-label="${escape(text)}" aria-selected="false" ${cell.future ? 'aria-disabled="true"' : ""}></button>`;
           })
           .join("")}</div>`,
     )
     .join("")}</div>`;
-  return `${header}${!hasData ? '<p class="heatmap-empty">No local token records yet.</p>' : ""}${grid}<div class="heatmap-meta">${scale}<span>${age === null ? "Not indexed yet" : `Indexed ${age < 1 ? "just now" : `${age}m ago`}`}</span></div><output class="heatmap-inspector" id="${id}-inspector" aria-live="polite">Select an hour for its token count. Arrow keys move between cells.</output><p class="heatmap-note">CLI logs on this machine · UTC · cached input included</p>${status ? `<p class="heatmap-warning" role="status">${escape(status.trim())}</p>` : ""}`;
+  return `${header}${!hasData ? '<p class="heatmap-empty">No local token records yet.</p>' : ""}${grid}<div class="heatmap-meta">${scale}<span>${age === null ? "Not indexed yet" : `Indexed ${age < 1 ? "just now" : `${age}m ago`}`}</span></div><output class="heatmap-inspector" id="${id}-inspector" aria-live="polite">Select an hour for its token count. Arrow keys move between cells.</output><p class="heatmap-note">CLI logs on this machine · ${escape(timezone)} · cached input included</p>${status ? `<p class="heatmap-warning" role="status">${escape(status.trim())}</p>` : ""}`;
 }
 
 function bindGrid(root) {
@@ -157,6 +159,9 @@ async function load() {
     if (!response.ok) throw Error();
     const next = await response.json();
     const key = JSON.stringify([
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      new Date().toDateString(),
+      new Date().getHours(),
       next.indexedAt,
       next.scanning,
       next.error,

@@ -49,7 +49,7 @@ Daily activity is not the same as subscription quota. Codex uses the dates retur
 
 Hourly heatmaps read timestamped token records from the installed CLIs' local logs. Codex uses native request records when present and cumulative token-count deltas for older logs. Claude assistant response records are deduplicated across content blocks. Kimi uses `usage.record` events. Repeated request IDs, copied legacy snapshots, and shared profile-directory symlinks count once. Counts include input, cached input, and output without adding already-included cache or reasoning tokens twice.
 
-These heatmaps cover this machine's retained logs, attributed to their current profile. They can include earlier sign-ins and exclude activity on other devices. They are not subscription percentages and need not match the separate provider daily chart. Empty cells mean no recorded local activity. Rows and hours use UTC; tapping a cell shows its exact count. The account selector and each account's details show individual heatmaps. All accounts uses the sum of the account views, and each view scales its colors to its own busiest hour.
+These heatmaps cover this machine's retained logs, attributed to their current profile. They can include earlier sign-ins and exclude activity on other devices. They are not subscription percentages and need not match the separate provider daily chart. Empty cells mean no recorded local activity. Rows and hours use the viewing device's timezone; repeated daylight-saving hours are combined and skipped hours remain empty; tapping a cell shows its exact count. The account selector and each account's details show individual heatmaps. All accounts uses the sum of the account views, and each view scales its colors to its own busiest hour.
 
 Token indexing runs independently of quota polling every five minutes. The first scan may take a minute or more for large log directories. Later scans reuse unchanged files. The index retains 90 days of timestamps, token counts, and hashed record identities; it does not store conversation text.
 
@@ -140,7 +140,7 @@ node --check public/heatmap.mjs
 node --test tests/heatmap.test.mjs
 ```
 
-Tests cover hourly UTC bucketing, copied-log deduplication, cache-inclusive token arithmetic, index updates and removals, primary-window duration, scoped and monthly windows, sparse Kimi quota responses, Claude terminal redraws and timezone parsing, Codex profile deduplication, stale-cache persistence, static-file boundaries, Host validation, and refresh request protection. Live checks also covered Tailscale HTTP access, desktop and phone layouts, filtering, dialogs, daily activity selection, and the boot restore path.
+Tests cover local-time bucketing across date boundaries, fractional offsets and daylight-saving changes, copied-log deduplication, cache-inclusive token arithmetic, index updates and removals, primary-window duration, scoped and monthly windows, sparse Kimi quota responses, Claude terminal redraws and timezone parsing, Codex profile deduplication, stale-cache persistence, static-file boundaries, Host validation, and refresh request protection. Live checks also covered Tailscale HTTP access, desktop and phone layouts, filtering, dialogs, daily activity selection, and the boot restore path.
 
 ## Sources
 

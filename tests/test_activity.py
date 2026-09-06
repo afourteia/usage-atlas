@@ -91,6 +91,9 @@ class ActivityTests(unittest.TestCase):
         index = TokenIndex(self.root/'index.sqlite3')
         result = index.scan([one, two])
         self.assertEqual(result['hours'][0]['tokens'], 300)
+        self.assertEqual(sum(b['tokens'] for b in result['buckets']), 300)
+        self.assertEqual(result['bucketSeconds'], 900)
+        self.assertEqual(sum(b['tokens'] for a in result['accounts'] for b in a['buckets']), 300)
         with p.open('a') as f:
             f.write(json.dumps(self.codex('new', 50, self.at+3600))+'\n')
         # Use a past timestamp, since the current hour's future is intentionally excluded.
