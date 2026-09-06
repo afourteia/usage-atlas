@@ -1,0 +1,6 @@
+{
+  "accounts": [
+    { "provider": "codex", "home": "~/.codex-work", "label": "Codex work" },
+    { "provider": "claude", "home": "~/.claude-work", "label": "Claude work" }
+  ]
+}

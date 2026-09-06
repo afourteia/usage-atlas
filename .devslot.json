@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "applications": {
+    "atlas": {
+      "command": ["/usr/bin/python3", "server.py"],
+      "health": { "type": "http", "path": "/api/health", "timeoutSeconds": 30 },
+      "preview": true,
+      "environment": { "PORT": "${DEVSLOT_ATLAS_PORT}", "HOST": "127.0.0.1" }
+    }
+  },
+  "groups": { "default": ["atlas"] }
+}
