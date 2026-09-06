@@ -17,6 +17,7 @@ from urllib.parse import parse_qs, urlsplit
 from atlas.profiles import discover
 from atlas.providers import ADAPTERS, Unavailable
 from atlas.store import Store
+from atlas.activity import TokenIndex
 
 ROOT = Path(__file__).resolve().parent
 
@@ -46,6 +47,33 @@ class Monitor:
         self.last_started = 0
         self.started = time.time()
         self.scan()
+        self.token_index = TokenIndex(self.data_dir / 'activity.sqlite3')
+        self.token_data = self.token_index.snapshot(self.profiles)
+        self.token_scanning = False
+        self.token_error = None
+
+    def run_tokens(self):
+        while not self.stop.is_set():
+            with self.lock:
+                self.token_scanning = True
+                profiles = copy.deepcopy(self.profiles)
+            try:
+                data = self.token_index.scan(profiles)
+                with self.lock:
+                    self.token_data = data
+                    self.token_error = None
+            except Exception:
+                with self.lock:
+                    self.token_error = 'Token log scan failed. Previous counts are retained.'
+            finally:
+                with self.lock:
+                    self.token_scanning = False
+            self.stop.wait(self.interval)
+
+    def tokens(self):
+        with self.lock:
+            return {**copy.deepcopy(self.token_data), 'scanning': self.token_scanning,
+                    'error': self.token_error}
 
     def scan(self):
         profiles = discover(config=ROOT / 'accounts.json')
@@ -155,6 +183,8 @@ def handler_for(monitor):
                 return self.send(200, {'status': 'ok', 'polling': monitor.polling})
             if url.path == '/api/snapshot':
                 return self.send(200, monitor.snapshot())
+            if url.path == '/api/tokens':
+                return self.send(200, monitor.tokens())
             if url.path == '/api/setup':
                 return self.send(200, monitor.setup())
             if url.path == '/api/history':
@@ -164,7 +194,7 @@ def handler_for(monitor):
                 except ValueError:
                     return self.send(400, {'error': 'Invalid history range.'})
                 return self.send(200, monitor.store.history(query.get('account', [''])[0], query.get('window', [''])[0], days))
-            routes = {'/': 'index.html', '/app.js': 'app.js', '/style.css': 'style.css', '/icon.svg': 'icon.svg', '/manifest.webmanifest': 'manifest.webmanifest'}
+            routes = {'/': 'index.html', '/app.js': 'app.js', '/heatmap.mjs': 'heatmap.mjs', '/heatmap-data.mjs': 'heatmap-data.mjs', '/style.css': 'style.css', '/icon.svg': 'icon.svg', '/manifest.webmanifest': 'manifest.webmanifest'}
             filename = routes.get(url.path)
             if filename:
                 path = ROOT / 'public' / filename
@@ -197,6 +227,7 @@ def main():
     monitor = Monitor()
     thread = threading.Thread(target=monitor.run, daemon=True)
     thread.start()
+    threading.Thread(target=monitor.run_tokens, daemon=True).start()
     server = ThreadingHTTPServer((os.environ.get('HOST', '127.0.0.1'), int(os.environ.get('PORT', '8080'))), handler_for(monitor))
     server.daemon_threads = True
     def shutdown(signum, frame):

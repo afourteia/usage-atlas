@@ -1418,3 +1418,450 @@ footer {
     width: auto;
   }
 }
+
+/* Dense utility theme. */
+:root {
+  --bg: #0e1110;
+  --panel: #151a16;
+  --border: #30382f;
+}
+body:before {
+  display: none;
+}
+main {
+  width: calc(100% - 32px);
+  max-width: 1440px;
+  padding-top: 12px;
+}
+.overview,
+.card,
+.panel,
+.refresh,
+.icon-button,
+.provider-logo,
+.bar,
+.bar-fill,
+.tab span,
+.panel select,
+dialog,
+.command,
+.copy,
+.history-select,
+.history-empty,
+.connection,
+.card-error,
+#toast {
+  border-radius: 0;
+}
+.overview,
+.card,
+.panel {
+  background: var(--panel);
+}
+.overview {
+  margin-bottom: 8px;
+}
+.overview > div {
+  padding: 12px 16px;
+}
+.stat-value {
+  font-size: 26px;
+  margin: 5px 0 3px;
+  letter-spacing: -0.6px;
+}
+.stat-value small {
+  font-size: 12px;
+}
+.collector-status {
+  font-size: 13px;
+  margin: 11px 0 6px;
+}
+.poll-track {
+  margin-top: 8px;
+}
+.section-heading {
+  margin-bottom: 8px;
+}
+.tab {
+  padding: 10px 0;
+  min-height: 40px;
+}
+.dashboard-actions {
+  padding-bottom: 3px;
+}
+.cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 8px;
+}
+.card {
+  animation: none;
+}
+.card-head {
+  padding: 7px 12px 2px;
+  gap: 8px;
+}
+.provider-logo {
+  width: 28px;
+  height: 28px;
+  font-size: 21px;
+}
+.provider-name {
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.card-menu {
+  width: 36px;
+  height: 36px;
+}
+.account-name {
+  padding: 0 12px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.account-name .profile-count {
+  margin-top: 1px;
+}
+.card-body {
+  padding: 0 12px;
+}
+.card .quota-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 14px;
+}
+.card .group-title {
+  grid-column: 1 / -1;
+  padding: 0 0 6px;
+  font-size: 9px;
+}
+.card .quota {
+  padding-bottom: 9px;
+  min-width: 0;
+}
+.card .quota:nth-child(2):last-child {
+  grid-column: 1 / -1;
+}
+.card .quota-group {
+  margin-bottom: 5px;
+  gap: 4px;
+}
+.card .quota-label,
+.card .quota-percent {
+  font-size: 11px;
+}
+.card .quota-percent span {
+  font-size: 9px;
+}
+.card .quota-meta {
+  font-size: 10px;
+  margin-top: 4px;
+  gap: 4px;
+}
+.card .bar {
+  height: 4px;
+}
+.extras {
+  padding: 6px 0;
+  gap: 6px 12px;
+}
+.extra {
+  font-size: 10px;
+}
+.extra strong {
+  display: inline;
+  font-size: 11px;
+  margin: 0 0 0 4px;
+}
+.card-footer {
+  padding: 0 12px;
+  min-height: 36px;
+}
+.card-footer button {
+  min-height: 36px;
+  font-size: 10px;
+}
+.lower-grid {
+  gap: 10px;
+  margin-top: 10px;
+}
+.panel {
+  padding: 14px 16px;
+  min-width: 0;
+}
+.panel h2 {
+  font-size: 17px;
+  letter-spacing: 0;
+}
+.panel select {
+  min-height: 36px;
+}
+.daily-summary {
+  margin-top: 12px;
+}
+.daily-summary strong {
+  font-size: 24px;
+}
+.daily-chart {
+  height: 110px;
+  margin: 10px 0;
+}
+.reset-item {
+  padding: 10px 0;
+}
+.token-panel {
+  margin-top: 10px;
+}
+.token-panel > .panel-heading {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.heatmap-controls {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+.heatmap-controls select {
+  max-width: none;
+  font-size: 11px;
+}
+#heatmap-account {
+  min-width: 0;
+  max-width: 300px;
+}
+#heatmap-days {
+  flex-shrink: 0;
+}
+.heatmap-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  padding: 10px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.heatmap-summary strong {
+  color: var(--text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.heatmap-grid {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+}
+.heatmap-row,
+.heatmap-axis {
+  display: grid;
+  grid-template-columns: 48px repeat(24, minmax(0, 1fr));
+  gap: 3px;
+}
+.heatmap-axis {
+  margin-bottom: 2px;
+}
+.heatmap-date,
+.heatmap-hour {
+  font:
+    10px ui-monospace,
+    monospace;
+  color: var(--muted);
+  align-self: center;
+}
+.heatmap-hour {
+  text-align: center;
+}
+.heatmap-cell {
+  height: 18px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  transition: none;
+}
+.heatmap-cell:hover {
+  filter: brightness(1.4);
+  outline: 1px solid var(--text);
+  z-index: 1;
+}
+.heatmap-cell[aria-selected="true"],
+.heatmap-cell:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 0;
+  z-index: 1;
+}
+.heatmap-cell.current {
+  border-bottom: 2px solid #e6a184;
+}
+.heat-0 {
+  background: #242b25;
+}
+.heat-1 {
+  background: #354b2b;
+}
+.heat-2 {
+  background: #516d37;
+}
+.heat-3 {
+  background: #799647;
+}
+.heat-4 {
+  background: #a1be62;
+}
+.heat-5 {
+  background: #d9f783;
+}
+.heatmap-cell.future {
+  background: transparent;
+  border: 1px solid #252c24;
+}
+.heatmap-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 9px;
+  font:
+    10px ui-monospace,
+    monospace;
+  color: var(--muted);
+}
+.heatmap-scale {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.heatmap-scale span:first-child {
+  margin-right: 4px;
+}
+.heatmap-scale span:last-child {
+  margin-left: 4px;
+}
+.heatmap-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 0;
+  box-shadow: none;
+}
+.heatmap-inspector {
+  display: block;
+  min-height: 34px;
+  padding: 8px 0 3px;
+  font:
+    11px/1.5 ui-monospace,
+    monospace;
+  color: var(--text);
+}
+.heatmap-note,
+.heatmap-empty {
+  font-size: 10px;
+  color: var(--muted);
+}
+.heatmap-warning {
+  font-size: 11px;
+  margin-top: 5px;
+  color: var(--claude);
+}
+#detail-dialog {
+  max-width: 800px;
+}
+#detail-heatmap {
+  margin: 8px 0 16px;
+}
+#detail-heatmap .heatmap-hour:not(.major) {
+  visibility: hidden;
+}
+#detail-heatmap .heatmap-row,
+#detail-heatmap .heatmap-axis {
+  gap: 2px;
+}
+#detail-heatmap .heatmap-cell {
+  height: 16px;
+}
+@media (max-width: 720px) {
+  main {
+    width: calc(100% - 20px);
+    padding-top: 8px;
+  }
+  .overview > div {
+    padding: 8px 10px;
+  }
+  .stat-value {
+    font-size: 22px;
+  }
+  .stat-note {
+    font-size: 10px;
+  }
+  .collector-status {
+    font-size: 12px;
+    margin-top: 7px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+  }
+  .card-head {
+    padding: 6px 10px 1px;
+  }
+  .account-name {
+    padding: 0 10px 7px;
+  }
+  .card-body {
+    padding: 0 10px;
+  }
+  .card-footer {
+    padding: 0 10px;
+  }
+  .panel {
+    padding: 12px 10px;
+  }
+  .heatmap-controls {
+    flex-basis: 100%;
+    justify-content: stretch;
+  }
+  #heatmap-account {
+    flex: 1;
+    max-width: none;
+    width: 0;
+  }
+  .heatmap-summary {
+    gap: 4px 12px;
+    font-size: 10px;
+  }
+  .heatmap-row,
+  .heatmap-axis {
+    grid-template-columns: 35px repeat(24, minmax(0, 1fr));
+    gap: 2px;
+  }
+  .heatmap-grid {
+    gap: 2px;
+  }
+  .heatmap-cell {
+    height: 16px;
+  }
+  .heatmap-date,
+  .heatmap-hour {
+    font-size: 8px;
+  }
+  .heatmap-hour:not(.major) {
+    visibility: hidden;
+  }
+  .heatmap-meta {
+    font-size: 9px;
+  }
+  .heatmap-inspector {
+    font-size: 10px;
+    min-height: 44px;
+  }
+  .heatmap-swatch {
+    width: 8px;
+    height: 8px;
+  }
+  .dashboard-actions .refresh {
+    border-radius: 0;
+  }
+}
+@media (min-width: 560px) and (max-width: 720px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

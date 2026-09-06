@@ -8,10 +8,12 @@ A personal, mobile-friendly dashboard for Codex, Claude Code, and Kimi Code subs
 - Compact mobile layout with usage bars, reset countdowns, provider filters, and account details.
 - Five-minute provider polling, manual refresh, and 90 days of quota history.
 - Daily token charts where the provider or CLI exposes activity.
+- Global and per-account hourly token heatmaps for 7, 14, 30, or 90 days, with tappable cells and keyboard navigation.
+- Square-edged panels and dense quota cards that fit narrow phone screens.
 - Per-account stale readings when a provider cannot be reached.
 - Optional Tailscale access and systemd startup through Devslot and Caddy.
 
-The app runs on Linux and requires Python 3.11 or newer plus the authenticated provider CLIs. It has no package dependencies. Node.js is only needed for the optional JavaScript syntax check.
+The app runs on Linux and requires Python 3.11 or newer plus the authenticated provider CLIs. It has no package dependencies. Node.js is only needed for the optional JavaScript checks and heatmap tests.
 
 ## Quick start
 
@@ -44,6 +46,12 @@ Quota percentages are provider measurements. They are not inferred from tokens o
 Claude reset times have minute precision. If a future CLI changes the date format, the original reset text is preserved instead of inventing a timestamp. All parsed reset timestamps display in the viewing browser's timezone. A countdown reaching zero waits for a new measurement.
 
 Daily activity is not the same as subscription quota. Codex uses the dates returned by its account service and may not have a bucket for today yet. Claude's cache can lag and can include earlier sign-ins in the same profile. Missing dates are displayed as unreported, not zero. Kimi still gets quota history from collected samples. History charts show hourly averages over a seven-day timeline and keep gaps between readings.
+
+Hourly heatmaps read timestamped token records from the installed CLIs' local logs. Codex uses native request records when present and cumulative token-count deltas for older logs. Claude assistant response records are deduplicated across content blocks. Kimi uses `usage.record` events. Repeated request IDs, copied legacy snapshots, and shared profile-directory symlinks count once. Counts include input, cached input, and output without adding already-included cache or reasoning tokens twice.
+
+These heatmaps cover this machine's retained logs, attributed to their current profile. They can include earlier sign-ins and exclude activity on other devices. They are not subscription percentages and need not match the separate provider daily chart. Empty cells mean no recorded local activity. Rows and hours use UTC; tapping a cell shows its exact count. The account selector and each account's details show individual heatmaps. All accounts uses the sum of the account views, and each view scales its colors to its own busiest hour.
+
+Token indexing runs independently of quota polling every five minutes. The first scan may take a minute or more for large log directories. Later scans reuse unchanged files. The index retains 90 days of timestamps, token counts, and hashed record identities; it does not store conversation text.
 
 Additional information includes Codex reset-credit counts and streaks, Claude's reported promotion and usage-credit status, and Kimi's membership level and parallel-request limit. Atlas never spends credits or redeems a reset.
 
@@ -120,7 +128,7 @@ Environment options:
 
 Loopback, the machine hostname, and Devslot's configured Tailscale IP are allowed Host values. Add a MagicDNS name explicitly to `ATLAS_ALLOWED_HOSTS` before using it. The API rejects foreign hosts and cross-site browser requests. Refresh requires a custom same-origin header. Static serving uses an explicit file allowlist.
 
-Data lives in `.data/usage.sqlite3` with private permissions. Stop the app before copying that file for a simple backup, or use SQLite's backup API while running. History and local account configuration are excluded from Git.
+Data lives in `.data/usage.sqlite3` and `.data/activity.sqlite3` inside a private directory. Stop the app before copying these files for a simple backup, or use SQLite's backup API while running. History and local account configuration are excluded from Git.
 
 ## Validation
 
@@ -128,9 +136,11 @@ Data lives in `.data/usage.sqlite3` with private permissions. Stop the app befor
 python3 -m unittest discover -s tests -v
 python3 -m compileall -q atlas server.py scripts
 node --check public/app.js
+node --check public/heatmap.mjs
+node --test tests/heatmap.test.mjs
 ```
 
-Tests cover primary-window duration, scoped and monthly windows, sparse Kimi quota responses, Claude terminal redraws and timezone parsing, Codex profile deduplication, stale-cache persistence, static-file boundaries, Host validation, and refresh request protection. Live checks also covered Tailscale HTTP access, desktop and phone layouts, filtering, dialogs, daily activity selection, and the boot restore path.
+Tests cover hourly UTC bucketing, copied-log deduplication, cache-inclusive token arithmetic, index updates and removals, primary-window duration, scoped and monthly windows, sparse Kimi quota responses, Claude terminal redraws and timezone parsing, Codex profile deduplication, stale-cache persistence, static-file boundaries, Host validation, and refresh request protection. Live checks also covered Tailscale HTTP access, desktop and phone layouts, filtering, dialogs, daily activity selection, and the boot restore path.
 
 ## Sources
 
